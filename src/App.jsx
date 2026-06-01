@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import useQuantumStore from './store/quantumStore';
 import StartScreen from './components/StartScreen';
 import Board3D from './components/Board3D';
@@ -9,16 +8,38 @@ import TimelineHUD from './components/TimelineHUD';
 import GameInfo from './components/GameInfo';
 import WinScreen from './components/WinScreen';
 
+const MenuScreen = StartScreen;
+
 export default function App() {
-  const initGame = useQuantumStore((s) => s.initGame);
-  const cancelSuperposition = useQuantumStore((s) => s.cancelSuperposition);
+  const { gameStatus, initGame, gamePhase } = useQuantumStore();
+  const gameScreen = gamePhase === 'start' ? 'menu' : 'playing';
 
   const gameMode = useQuantumStore((s) => s.gameMode);
-  const setGameMode = useQuantumStore((s) => s.setGameMode);
   const currentTurn = useQuantumStore((s) => s.currentTurn);
   const aiColor = useQuantumStore((s) => s.aiColor);
-  const gamePhase = useQuantumStore((s) => s.gamePhase);
   const triggerAIMove = useQuantumStore((s) => s.triggerAIMove);
+
+  // Initialize board parameters on mount, but reset phase to start to keep menu active
+  useEffect(() => {
+    initGame();
+    useQuantumStore.setState({ gamePhase: 'start' });
+  }, [initGame]);
+
+  // Handle Escape key
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === 'Escape') {
+        const state = useQuantumStore.getState();
+        if (state.cancelActiveMode) {
+          state.cancelActiveMode();
+        } else if (state.cancelSuperposition) {
+          state.cancelSuperposition();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []);
 
   // Trigger AI move automatically when it is the AI opponent's turn
   useEffect(() => {
@@ -30,103 +51,79 @@ export default function App() {
     }
   }, [currentTurn, gameMode, aiColor, gamePhase, triggerAIMove]);
 
-  // Bind Escape keyboard shortcut to cancel active split coordinates selection
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        cancelSuperposition();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [cancelSuperposition]);
+  if (gameScreen === 'menu') return <MenuScreen />;
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-[#080c18] font-[var(--font-body)] text-white select-none">
-      <AnimatePresence mode="wait">
-        {gamePhase === 'start' ? (
-          <StartScreen key="start-screen" />
-        ) : (
-          <motion.div
-            key="game-screen"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 w-full h-full"
-          >
-            {/* 3D WebGL Base Canvas */}
-            <Board3D />
+    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+      
+      {/* 3D Scene — full screen base layer */}
+      <div style={{ position: 'absolute', inset: 0 }}>
+        <Board3D />
+      </div>
 
-            {/* Left Column Controls */}
-            <QuantumHUD />
+      {/* Left HUD */}
+      <div style={{ 
+        position: 'fixed', left: 0, top: 0, 
+        height: '100vh', width: '220px',
+        zIndex: 10, pointerEvents: 'none'
+      }}>
+        <div style={{ pointerEvents: 'auto', height: '100%' }}>
+          <QuantumHUD />
+        </div>
+      </div>
 
-            {/* Right Column Controls */}
-            <TimelineHUD />
+      {/* Right HUD */}
+      <div style={{ 
+        position: 'fixed', right: 0, top: 0, 
+        height: '100vh', width: '220px',
+        zIndex: 10, pointerEvents: 'none'
+      }}>
+        <div style={{ pointerEvents: 'auto', height: '100%' }}>
+          <TimelineHUD />
+        </div>
+      </div>
 
-            {/* Top Center Title Header */}
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center">
-              <div
-                className="w-[280px] py-3 rounded-2xl border text-center flex flex-col gap-1 items-center"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(8, 12, 24, 0.8), rgba(15, 20, 35, 0.5))',
-                  backdropFilter: 'blur(12px)',
-                  borderColor: 'rgba(0, 212, 255, 0.15)',
-                  boxShadow: '0 4px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 212, 255, 0.05)',
-                }}
-              >
-                <h1
-                  className="text-lg font-[var(--font-display)] font-bold tracking-[0.25em] glow-text text-[#00d4ff]"
-                  style={{ textShadow: '0 0 10px rgba(0, 212, 255, 0.35)' }}
-                >
-                  QUANTUM CHESS
-                </h1>
-                <span className="text-[9px] font-[var(--font-mono)] text-gray-500 uppercase tracking-widest">
-                  3D Edition
-                </span>
+      {/* Bottom bar */}
+      <div style={{ 
+        position: 'fixed', bottom: 0, left: '220px', 
+        right: '220px', zIndex: 10 
+      }}>
+        <GameInfo />
+      </div>
 
-                {/* Mode Selector Panel */}
-                <div className="border-t border-gray-800/40 w-[90%] my-1.5" />
-                <div className="flex justify-center gap-2.5 px-3 pb-0.5">
-                  <button
-                    onClick={() => {
-                      setGameMode('local');
-                      initGame();
-                    }}
-                    className={`px-3 py-1 rounded-md text-[9px] font-[var(--font-display)] tracking-wider border transition-all cursor-pointer ${
-                      gameMode === 'local'
-                        ? 'border-[#00d4ff]/60 bg-[#00d4ff]/10 text-[#00d4ff]'
-                        : 'border-gray-800 text-gray-500 hover:border-gray-700 bg-transparent'
-                    }`}
-                  >
-                    👥 LOCAL
-                  </button>
-                  <button
-                    onClick={() => {
-                      setGameMode('ai');
-                      initGame();
-                    }}
-                    className={`px-3 py-1 rounded-md text-[9px] font-[var(--font-display)] tracking-wider border transition-all cursor-pointer ${
-                      gameMode === 'ai'
-                        ? 'border-[#b47eff]/60 bg-[#b47eff]/10 text-[#b47eff]'
-                        : 'border-gray-800 text-gray-500 hover:border-gray-700 bg-transparent'
-                    }`}
-                  >
-                    🤖 VS AI
-                  </button>
-                </div>
-              </div>
-            </div>
+      {/* Top title bar */}
+      <div style={{
+        position: 'fixed', top: 16, left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 10, textAlign: 'center',
+        background: 'rgba(255,255,255,0.04)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(0,204,255,0.2)',
+        borderRadius: '12px',
+        padding: '8px 24px'
+      }}>
+        <div style={{ 
+          fontSize: '14px', fontWeight: 700, 
+          letterSpacing: '0.15em', color: '#00ccff',
+          textShadow: '0 0 10px #00ccff'
+        }}>
+          QUANTUM CHESS
+        </div>
+        <div style={{ 
+          fontSize: '10px', color: 'rgba(150,180,255,0.6)',
+          letterSpacing: '0.1em'
+        }}>
+          3D EDITION
+        </div>
+      </div>
 
-            {/* Bottom Status bar */}
-            <GameInfo />
-
-            {/* Endgame scorecard Win/Stalemate screen overlay */}
-            <WinScreen />
-          </motion.div>
+      {/* Win screen */}
+      <AnimatePresence>
+        {(gameStatus === 'checkmate' || gameStatus === 'stalemate') && (
+          <WinScreen />
         )}
       </AnimatePresence>
+
     </div>
   );
 }

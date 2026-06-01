@@ -8,14 +8,14 @@ import Wormhole3D from './Wormhole3D';
 import useQuantumStore from '../store/quantumStore';
 import { squareToCoords, coordsToSquare } from '../engine/chessEngine';
 
-// Pre-generate 800 star coordinates globally (runs once at module level)
-const STAR_POSITIONS = new Float32Array(800 * 3);
-for (let i = 0; i < 800; i++) {
+// Pre-generate 1200 star coordinates globally (runs once at module level)
+const STAR_POSITIONS = new Float32Array(1200 * 3);
+for (let i = 0; i < 1200; i++) {
   const u = Math.random();
   const v = Math.random();
   const theta = u * 2.0 * Math.PI;
   const phi = Math.acos(2.0 * v - 1.0);
-  const r = 60;
+  const r = 80;
   STAR_POSITIONS[i * 3] = r * Math.sin(phi) * Math.cos(theta);
   STAR_POSITIONS[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
   STAR_POSITIONS[i * 3 + 2] = r * Math.cos(phi);
@@ -36,8 +36,14 @@ function Starfield() {
   }, [starGeo]);
 
   return (
-    <points geometry={starGeo}>
-      <pointsMaterial color="#ffffff" size={0.08} sizeAttenuation={true} />
+    <points geometry={starGeo} renderOrder={-1}>
+      <pointsMaterial 
+        color="#ffffff" 
+        size={0.12} 
+        sizeAttenuation={true} 
+        opacity={1.0} 
+        transparent={false} 
+      />
     </points>
   );
 }
@@ -191,17 +197,48 @@ function BoardScene() {
 
   return (
     <>
-      {/* Lighting Rig */}
-      <ambientLight intensity={0.4} />
-      <directionalLight
-        position={[5, 10, 5]}
-        intensity={1.2}
+      {/* Subtle board base platform under the squares */}
+      <mesh position={[0, -0.12, 0]} receiveShadow>
+        <boxGeometry args={[8.4, 0.15, 8.4]} />
+        <meshStandardMaterial 
+          color="#0d1128" 
+          metalness={0.4} 
+          roughness={0.8}
+        />
+      </mesh>
+
+      {/* Main key light */}
+      <directionalLight 
+        position={[4, 10, 6]} 
+        intensity={1.4} 
         castShadow
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-near={0.5}
+        shadow-camera-far={50}
+        shadow-camera-left={-8}
+        shadow-camera-right={8}
+        shadow-camera-top={8}
+        shadow-camera-bottom={-8}
       />
-      <pointLight position={[-5, 8, -5]} intensity={0.6} color="#4466ff" />
-      <pointLight position={[5, 8, 5]} intensity={0.4} color="#ff6644" />
+
+      {/* Ambient fill */}
+      <ambientLight intensity={0.35} color="#1a2040" />
+
+      {/* Blue rim light from back-left */}
+      <pointLight position={[-6, 5, -6]} intensity={0.8} color="#2244ff" />
+
+      {/* Warm accent from front-right */}
+      <pointLight position={[6, 4, 6]} intensity={0.5} color="#ff8844" />
+
+      {/* Dedicated under-glow for black pieces */}
+      <pointLight position={[0, 1, -3.5]} intensity={0.9} color="#4466ee" />
+
+      {/* Dedicated point light inside Board3D for black pieces */}
+      <pointLight position={[0, 3, -4]} intensity={1.2} color="#6688ff" />
+
+      {/* Wormhole atmosphere glow */}
+      <pointLight position={[0, 2, 0]} intensity={0.3} color="#ff4400" />
 
       {/* Starfield Background */}
       <Starfield />
@@ -238,6 +275,7 @@ function BoardScene() {
 
       <OrbitControls
         makeDefault
+        target={[0, 0, 0]}
         maxPolarAngle={Math.PI / 2.2}
         enablePan={false}
         minDistance={8}
@@ -252,11 +290,11 @@ export default function Board3D() {
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
       <Canvas
         shadows={true}
-        camera={{ position: [0, 12, 10], fov: 50 }}
+        camera={{ position: [0, 14, 12], fov: 50 }}
         gl={{ antialias: true, alpha: false }}
       >
-        <color attach="background" args={['#080c18']} />
-        <fog attach="fog" args={['#080c18', 12, 28]} />
+        <color attach="background" args={['#020408']} />
+        <fog attach="fog" args={['#020408', 18, 45]} />
         <Suspense fallback={null}>
           <BoardScene />
         </Suspense>

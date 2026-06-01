@@ -10,7 +10,8 @@ const Piece3D = React.memo(({ piece }) => {
 
   // Geometries memoization
   const pawnBaseGeo = useMemo(() => new THREE.CylinderGeometry(0.18, 0.22, 0.35, 16), []);
-  const pawnHeadGeo = useMemo(() => new THREE.SphereGeometry(0.16, 16, 16), []);
+  const pawnHeadGeo = useMemo(() => new THREE.SphereGeometry(0.13, 16, 16), []);
+
 
   const rookBaseGeo = useMemo(() => new THREE.CylinderGeometry(0.2, 0.24, 0.4, 16), []);
   const rookTopGeo = useMemo(() => new THREE.BoxGeometry(0.38, 0.12, 0.38), []);
@@ -53,9 +54,11 @@ const Piece3D = React.memo(({ piece }) => {
       });
     } else {
       return new THREE.MeshStandardMaterial({
-        color: '#1a1a2e',
-        metalness: 0.5,
-        roughness: 0.3,
+        color: '#2a2a4e',
+        metalness: 0.8,
+        roughness: 0.2,
+        emissive: '#1a1a3a',
+        emissiveIntensity: 0.3,
       });
     }
   }, [isGhost, color]);
@@ -93,10 +96,15 @@ const Piece3D = React.memo(({ piece }) => {
   useFrame((state) => {
     if (!groupRef.current) return;
     const time = state.clock.getElapsedTime();
+    const baseY = 0.25;
 
     // Lerp y position based on selection: 0.55 when selected, 0.25 when standard
-    const targetY = isSelected ? 0.55 : 0.25;
-    groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, targetY, 0.12);
+    if (isSelected) {
+      groupRef.current.position.y =
+        baseY + Math.sin(state.clock.elapsedTime * 2) * 0.04 + 0.3;
+    } else {
+      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, baseY, 0.12);
+    }
 
     // Pulse emissiveIntensity for ghost wavefunctions by traversing group meshes safely
     if (isGhost) {
@@ -175,7 +183,7 @@ const Piece3D = React.memo(({ piece }) => {
       position={[col - 3.5, isSelected ? 0.55 : 0.25, row - 3.5]}
       raycast={isGhost ? () => null : undefined}
     >
-      <group scale={[1.2, 1.2, 1.2]}>
+      <group scale={[1, 1, 1]}>
         {renderGeometries()}
       </group>
 

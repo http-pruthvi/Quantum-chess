@@ -106,7 +106,12 @@ export default function StartScreen() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.25 }}
-            className="text-gray-400 text-sm font-[var(--font-body)] leading-relaxed max-w-md"
+            className="font-[var(--font-body)] max-w-md"
+            style={{
+              color: 'rgba(180, 200, 255, 0.85)',
+              fontSize: '14px',
+              lineHeight: '1.7',
+            }}
           >
             A high-dimensional battlefield where classical rules collide with quantum physics. Place pieces in superposition, warp coordinates through portals, and rewrite history using temporal rollback maneuvers.
           </motion.p>
@@ -147,10 +152,23 @@ export default function StartScreen() {
         >
           {/* Header */}
           <div>
-            <h2 className="text-xs font-[var(--font-display)] tracking-[0.25em] text-[#00d4ff] uppercase mb-1">
+            <h2 
+              className="text-xs font-[var(--font-display)] uppercase mb-1"
+              style={{
+                color: 'rgba(200, 220, 255, 0.95)',
+                fontWeight: 600,
+                letterSpacing: '0.08em'
+              }}
+            >
               Battle Setup Protocol
             </h2>
-            <p className="text-[10px] font-[var(--font-mono)] text-gray-500 uppercase tracking-widest">
+            <p 
+              className="font-[var(--font-mono)] uppercase"
+              style={{
+                color: 'rgba(140, 160, 210, 0.7)',
+                fontSize: '12px'
+              }}
+            >
               Select game parameters below to ignite the simulation
             </p>
           </div>
@@ -160,21 +178,49 @@ export default function StartScreen() {
             {/* Local Card */}
             <button
               onClick={() => setMode('local')}
-              className={`flex-1 p-5 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden group cursor-pointer ${
-                mode === 'local'
-                  ? 'border-[#00d4ff] bg-[#00d4ff]/[0.06] shadow-[0_0_15px_rgba(0,212,255,0.1)]'
-                  : 'border-white/[0.04] bg-white/[0.01] hover:border-white/[0.1] hover:bg-white/[0.03]'
-              }`}
+              className="flex-1 p-5 rounded-2xl text-left transition-all duration-300 relative overflow-hidden group cursor-pointer border"
+              style={{
+                border: mode === 'local' 
+                  ? '1px solid rgba(0, 204, 255, 0.6)' 
+                  : '1px solid rgba(0, 204, 255, 0.25)',
+                background: mode === 'local' 
+                  ? 'rgba(0, 136, 255, 0.18)' 
+                  : 'rgba(255, 255, 255, 0.06)',
+                boxShadow: mode === 'local'
+                  ? '0 0 20px rgba(0, 212, 255, 0.35)'
+                  : 'none',
+              }}
+              onMouseEnter={(e) => {
+                if (mode !== 'local') {
+                  e.currentTarget.style.borderColor = 'rgba(0, 204, 255, 0.6)';
+                  e.currentTarget.style.background = 'rgba(0, 136, 255, 0.12)';
+                  e.currentTarget.style.boxShadow = '0 0 16px rgba(0, 204, 255, 0.2)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (mode !== 'local') {
+                  e.currentTarget.style.borderColor = 'rgba(0, 204, 255, 0.25)';
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }
+              }}
             >
               {/* Highlight bar */}
-              <div className={`absolute top-0 left-0 right-0 h-1 transition-all ${
-                mode === 'local' ? 'bg-[#00d4ff]' : 'bg-transparent'
-              }`} />
+              <div 
+                className="absolute top-0 left-0 right-0 h-1 bg-[#00d4ff]" 
+                style={{ display: mode === 'local' ? 'block' : 'none' }}
+              />
               <div className="text-xl mb-1.5">👥</div>
-              <div className="font-[var(--font-display)] text-xs tracking-wider uppercase text-white font-bold">
+              <div 
+                className="font-[var(--font-display)] text-xs tracking-wider uppercase font-bold"
+                style={{ color: 'rgba(220, 235, 255, 0.95)' }}
+              >
                 Local Pass & Play
               </div>
-              <div className="text-[10px] font-[var(--font-body)] text-gray-400 mt-1 uppercase tracking-wide">
+              <div 
+                className="font-[var(--font-body)] mt-1 uppercase tracking-wide"
+                style={{ color: 'rgba(150, 170, 220, 0.75)', fontSize: '12px' }}
+              >
                 Two players share standard screen and controls.
               </div>
             </button>
@@ -182,21 +228,49 @@ export default function StartScreen() {
             {/* VS AI Card */}
             <button
               onClick={() => setMode('ai')}
-              className={`flex-1 p-5 rounded-2xl border text-left transition-all duration-300 relative overflow-hidden group cursor-pointer ${
-                mode === 'ai'
-                  ? 'border-[#8b5cf6] bg-[#8b5cf6]/[0.06] shadow-[0_0_15px_rgba(139,92,246,0.1)]'
-                  : 'border-white/[0.04] bg-white/[0.01] hover:border-white/[0.1] hover:bg-white/[0.03]'
-              }`}
+              className="flex-1 p-5 rounded-2xl text-left transition-all duration-300 relative overflow-hidden group cursor-pointer border"
+              style={{
+                border: mode === 'ai' 
+                  ? '1px solid rgba(0, 204, 255, 0.6)' 
+                  : '1px solid rgba(0, 204, 255, 0.25)',
+                background: mode === 'ai' 
+                  ? 'rgba(0, 136, 255, 0.18)' 
+                  : 'rgba(255, 255, 255, 0.06)',
+                boxShadow: mode === 'ai'
+                  ? '0 0 20px rgba(0, 212, 255, 0.35)'
+                  : 'none',
+              }}
+              onMouseEnter={(e) => {
+                if (mode !== 'ai') {
+                  e.currentTarget.style.borderColor = 'rgba(0, 204, 255, 0.6)';
+                  e.currentTarget.style.background = 'rgba(0, 136, 255, 0.12)';
+                  e.currentTarget.style.boxShadow = '0 0 16px rgba(0, 204, 255, 0.2)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (mode !== 'ai') {
+                  e.currentTarget.style.borderColor = 'rgba(0, 204, 255, 0.25)';
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }
+              }}
             >
               {/* Highlight bar */}
-              <div className={`absolute top-0 left-0 right-0 h-1 transition-all ${
-                mode === 'ai' ? 'bg-[#8b5cf6]' : 'bg-transparent'
-              }`} />
+              <div 
+                className="absolute top-0 left-0 right-0 h-1 bg-[#8b5cf6]" 
+                style={{ display: mode === 'ai' ? 'block' : 'none' }}
+              />
               <div className="text-xl mb-1.5">🤖</div>
-              <div className="font-[var(--font-display)] text-xs tracking-wider uppercase text-white font-bold">
+              <div 
+                className="font-[var(--font-display)] text-xs tracking-wider uppercase font-bold"
+                style={{ color: 'rgba(220, 235, 255, 0.95)' }}
+              >
                 Vs Artificial Mind
               </div>
-              <div className="text-[10px] font-[var(--font-body)] text-gray-400 mt-1 uppercase tracking-wide">
+              <div 
+                className="font-[var(--font-body)] mt-1 uppercase tracking-wide"
+                style={{ color: 'rgba(150, 170, 220, 0.75)', fontSize: '12px' }}
+              >
                 Engage the quantum Minimax decision AI.
               </div>
             </button>
@@ -252,19 +326,24 @@ export default function StartScreen() {
                 { id: 'superposition', label: '⚛️ ψ Superposition' },
                 { id: 'chronos', label: '⏳ Chronos Reversion' },
                 { id: 'wormholes', label: '🌀 ER Wormholes' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 text-[10px] font-[var(--font-display)] tracking-wider uppercase border-b-2 transition-all cursor-pointer ${
-                    activeTab === tab.id
-                      ? 'border-[#00d4ff] text-[#00d4ff] font-bold'
-                      : 'border-transparent text-gray-500 hover:text-gray-400'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+              ].map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className="px-4 py-2 text-[10px] font-[var(--font-display)] tracking-wider uppercase rounded-lg transition-all cursor-pointer border"
+                    style={{
+                      background: isActive ? 'rgba(0, 136, 255, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                      border: isActive ? '1px solid rgba(0, 204, 255, 0.5)' : '1px solid rgba(255, 255, 255, 0.12)',
+                      color: isActive ? '#00ccff' : 'rgba(160, 175, 210, 0.6)',
+                      boxShadow: isActive ? '0 0 8px rgba(0, 204, 255, 0.3)' : 'none',
+                    }}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Rule Content Box */}
@@ -274,7 +353,15 @@ export default function StartScreen() {
                   <div className="font-[var(--font-display)] text-xs text-[#00d4ff] uppercase tracking-widest font-bold mb-1.5">
                     ψ Quantum Split
                   </div>
-                  <p className="text-gray-400 text-[10px] font-[var(--font-body)] leading-relaxed uppercase tracking-wide">
+                  <p 
+                    className="font-[var(--font-body)] leading-relaxed uppercase tracking-wide"
+                    style={{
+                      color: 'rgba(160, 185, 255, 0.75)',
+                      borderLeft: '2px solid rgba(0, 204, 255, 0.4)',
+                      paddingLeft: '10px',
+                      fontSize: '13px',
+                    }}
+                  >
                     Place a piece into superposition. The piece splits into two states—a physical entity and a ghost shadow—across two squares. Wave functions collapse upon contact, prompting coordinates resolution.
                   </p>
                   <div className="text-[8px] font-[var(--font-mono)] text-[#00d4ff]/70 mt-3 tracking-widest uppercase">
@@ -287,7 +374,15 @@ export default function StartScreen() {
                   <div className="font-[var(--font-display)] text-xs text-[#ff3366] uppercase tracking-widest font-bold mb-1.5">
                     Temporal Rollback
                   </div>
-                  <p className="text-gray-400 text-[10px] font-[var(--font-body)] leading-relaxed uppercase tracking-wide">
+                  <p 
+                    className="font-[var(--font-body)] leading-relaxed uppercase tracking-wide"
+                    style={{
+                      color: 'rgba(160, 185, 255, 0.75)',
+                      borderLeft: '2px solid rgba(0, 204, 255, 0.4)',
+                      paddingLeft: '10px',
+                      fontSize: '13px',
+                    }}
+                  >
                     Trigger chronos drive to roll the universe back in time by 3 full plies. Reverses tactical errors, clears board changes, and restores capturing states instantly to prior history marks.
                   </p>
                   <div className="text-[8px] font-[var(--font-mono)] text-[#ff3366]/70 mt-3 tracking-widest uppercase">
@@ -300,7 +395,15 @@ export default function StartScreen() {
                   <div className="font-[var(--font-display)] text-xs text-[#ff8c00] uppercase tracking-widest font-bold mb-1.5">
                     ER Portal warp
                   </div>
-                  <p className="text-gray-400 text-[10px] font-[var(--font-body)] leading-relaxed uppercase tracking-wide">
+                  <p 
+                    className="font-[var(--font-body)] leading-relaxed uppercase tracking-wide"
+                    style={{
+                      color: 'rgba(160, 185, 255, 0.75)',
+                      borderLeft: '2px solid rgba(0, 204, 255, 0.4)',
+                      paddingLeft: '10px',
+                      fontSize: '13px',
+                    }}
+                  >
                     Entering one of the four wormhole tiles immediately warps your piece to the linked coordinate elsewhere on the board. Kings are structurally barred to preserve gravity sync.
                   </p>
                   <div className="text-[8px] font-[var(--font-mono)] text-[#ff8c00]/70 mt-3 tracking-widest uppercase">
